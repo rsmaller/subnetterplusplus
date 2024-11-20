@@ -32,6 +32,11 @@ bool debugFlag = false;
 bool reverseFlag = false;
 int numberFlag = 0;
 
+void usage() {
+    cout << "Usage: " << basename(globalArgumentVector[0]) << " ipaddr netmask1 <netmask2> <-b[inary]|d[ebug]|r[everse]>" << endl;
+    exit(0);
+}
+
 class IP {
 public:
     IPNumeric IPAddress;
@@ -45,7 +50,7 @@ public:
             this -> IPAddress = StringToIPInt(stringArg);
             this -> IPString = stringArg;
         } else if (isIPNumber(stringArg)) {
-            this -> IPAddress.IP32 = stoi(stringArg);
+            this -> IPAddress.IP32 = (unsigned int)stoi(stringArg);
             this -> IPString = intToIPString(this -> IPAddress);
         } else {
             this -> IPString = "0.0.0.0";
@@ -55,7 +60,7 @@ public:
         this -> IPBinaryString = toIPBinaryString(this -> IPAddress);
     }
 
-    IP(int IPArg) {
+    IP(unsigned int IPArg) {
         this -> IPAddress.IP32 = IPArg;
         this -> IPString = intToIPString(this -> IPAddress);
         this -> IPBinaryString = toIPBinaryString(this -> IPAddress);
@@ -84,21 +89,24 @@ public:
     static IPNumeric StringToIPInt(string stringArg) {
         IPNumeric returnValue;
         IPNumeric CIDRConversion;
-        char *CStyleStringArg;
+        char *CStyleStringArg = (char *)malloc(sizeof(char) * stringArg.length() + 1);
         if (isIPFormat(stringArg)) {
-            CStyleStringArg = strdup((char *)stringArg.c_str());
+            strcpy(CStyleStringArg, stringArg.c_str());
         } else if (isCIDRMask(stringArg)) {
             CIDRConversion.IP32 = ~((1<<(32-stoi(stringArg)))-1);
-            CStyleStringArg = strdup((char *)intToIPString(CIDRConversion).c_str());
+            strcpy(CStyleStringArg, intToIPString(CIDRConversion).c_str());
+        } else {
+            returnValue = {0};
+            return returnValue;
         }
         char *currentOctet = strtok(CStyleStringArg, ".");
-        returnValue.octets[3] = atoi(currentOctet);
+        returnValue.octets[3] = (unsigned char)atoi(currentOctet);
         currentOctet = strtok(NULL, ".");
-        returnValue.octets[2] = atoi(currentOctet);
+        returnValue.octets[2] = (unsigned char)atoi(currentOctet);
         currentOctet = strtok(NULL, ".");
-        returnValue.octets[1] = atoi(currentOctet);
+        returnValue.octets[1] = (unsigned char)atoi(currentOctet);
         currentOctet = strtok(NULL, ".");
-        returnValue.octets[0] = atoi(currentOctet);
+        returnValue.octets[0] = (unsigned char)atoi(currentOctet);
         return returnValue;
     }
 
@@ -144,11 +152,11 @@ public:
         }
     }
 
-    IP operator+(int operand) {
+    IP operator+(unsigned int operand) {
         return IP(this->IPAddress.IP32 + operand);
     }
 
-    IP operator-(int operand) {
+    IP operator-(unsigned int operand) {
         return IP(this->IPAddress.IP32 - operand);
     }
 
@@ -156,15 +164,15 @@ public:
         return IP(this->IPAddress.IP32 & operand.IPAddress.IP32);
     }
 
-    void operator+=(int operand) {
+    void operator+=(unsigned int operand) {
         *this = (*this + operand);
     }
 
-    void operator-=(int operand) {
+    void operator-=(unsigned int operand) {
         *this = (*this - operand);
     }
 
-    void operator&=(int operand) {
+    void operator&=(unsigned int operand) {
         *this = (*this & operand);
     }
 
@@ -183,7 +191,7 @@ public:
             this -> IPString = intToIPString(this -> IPAddress);
             this -> IPBinaryString = toIPBinaryString(this -> IPAddress);
         }
-        this -> hostBits = fetchHostBits(this -> IPAddress.IP32);
+        this -> hostBits = fetchHostBits((int)this -> IPAddress.IP32);
         if (!unusualFormat) {
             this -> blockSize = 1<<this -> hostBits;
         } else {
@@ -210,13 +218,21 @@ public:
     SubnetMask() {}
 
     static int fetchHostBits(int IPNumber) {
-        int IPComplement = (~IPNumber) + 1;
+        int IPComplement = (int)(~IPNumber) + 1;
         for (int i=0; i<=32; i++) {
             if (1<<i == IPComplement) {
                 return i;
             }
         }
         return 0;
+    }
+
+    static bool verifyMask(SubnetMask netArg) {
+        if (SubnetMask(netArg.networkBits).IPString.compare(netArg.IPString)) {
+            // cout << "Failed test mask " << netArg << " against " << SubnetMask(netArg.networkBits) << endl;
+            return false;
+        }
+        return true;
     }
 };
 
@@ -263,9 +279,9 @@ public:
         for (int i=3; i>=0; i--) {
             returnString += IP::toBinaryString(IPArg.IPAddress.octets[i]);
         }
-        for (int i=0; i<returnString.length(); i++) {
-            if (i>=32-changingBits && returnString[i] != '.') {
-                returnString[i] = 'x';
+        for (int i=0; i<(int)returnString.length(); i++) {
+            if (i>=32-changingBits && returnString[(size_t)i] != '.') {
+                returnString[(size_t)i] = 'x';
             }
         }
         for (int i=1; i<=3; i++) {
@@ -275,7 +291,7 @@ public:
     }
 
     int getChangingOctets(SubnetMask netMask) {
-        return ceil(netMask.hostBits / 8.0); // division requires float argument to return float.
+        return (int)ceil(netMask.hostBits / 8.0); // division requires float argument to return float.
     }
 };
 
@@ -292,7 +308,7 @@ public:
     Subnet(IP IPAddress, SubnetMask netMask) {
         this -> networkIP = IPAddress & netMask;
         this -> startIP = networkIP + 1;
-        this -> broadcastIP = networkIP + (netMask.blockSize - 1);
+        this -> broadcastIP = networkIP + (unsigned int)(netMask.blockSize - 1);
         this -> endIP = broadcastIP - 1;
         this -> netMask = netMask;
     }
@@ -326,11 +342,6 @@ public:
     }
 };
 
-void usage() {
-    cout << "Usage: " << basename(globalArgumentVector[0]) << " ipaddr netmask1 <netmask2> <-b[inary]|d[ebug]|r[everse]>" << endl;
-    exit(0);
-}
-
 void VLSM(IP IPAddr, SubnetMask netMask1, SubnetMask netMask2) {
     if (IPAddr.unusualFormat || netMask1.unusualFormat || netMask2.unusualFormat || netMask1.blockSize < netMask2.blockSize) {
         usage();
@@ -350,15 +361,15 @@ void VLSM(IP IPAddr, SubnetMask netMask1, SubnetMask netMask2) {
     }
     cout << "-------------------------------------------------------------------" << endl;
     if (reverseFlag) {
-        localIPCopy += netMask2.blockSize * (subnetsToGenerate - 1);
+        localIPCopy += (unsigned int)netMask2.blockSize * ((unsigned int)subnetsToGenerate - 1);
         for (int i=0; i<subnetsToGenerate; i++) {
             cout << Subnet(localIPCopy, netMask2) << endl;
-            localIPCopy -= netMask2.blockSize;
+            localIPCopy -= (unsigned int)netMask2.blockSize;
         }
     } else {
         for (int i=0; i<subnetsToGenerate; i++) {
             cout << Subnet(localIPCopy, netMask2) << endl;
-            localIPCopy += netMask2.blockSize;
+            localIPCopy += (unsigned int)netMask2.blockSize;
         }
     }
 }
@@ -392,6 +403,11 @@ arguments getArgs(int argc, char **argv) {
         argStruct.netMask2ArgumentIndex = argStruct.netMask1ArgumentIndex;
         argStruct.netMask2Found = true;
     }
+    SubnetMask testMask1(argv[argStruct.netMask1ArgumentIndex]);
+    SubnetMask testMask2(argv[argStruct.netMask2ArgumentIndex]);
+    if (!SubnetMask::verifyMask(testMask2) || !SubnetMask::verifyMask(testMask1)) {
+        usage();
+    }
     if (SubnetMask(argv[argStruct.netMask1ArgumentIndex]).networkBits > SubnetMask(argv[argStruct.netMask2ArgumentIndex]).networkBits) {
         swapper = argStruct.netMask1ArgumentIndex;
         argStruct.netMask1ArgumentIndex = argStruct.netMask2ArgumentIndex;
@@ -409,8 +425,8 @@ void setFlags(arguments args) {
     if (regex_search(args.customArgumentVector, matches, numberExpression)) {
         numberFlag = stoi(matches.str(0));
     }
-    for (int i=0; i<args.customArgumentVector.length(); i++) {
-        switch (args.customArgumentVector[i]) {
+    for (int i=0; i<(int)args.customArgumentVector.length(); i++) {
+        switch (args.customArgumentVector[(size_t)i]) {
             case 'b':
                 binaryFlag = true;
                 break;
