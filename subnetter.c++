@@ -88,7 +88,7 @@ public:
         if (isIPFormat(stringArg)) {
             CStyleStringArg = strdup((char *)stringArg.c_str());
         } else if (isCIDRMask(stringArg)) {
-            CIDRConversion.IP32 = ~(1<<(32-stoi(stringArg))-1);
+            CIDRConversion.IP32 = ~((1<<(32-stoi(stringArg)))-1);
             CStyleStringArg = strdup((char *)intToIPString(CIDRConversion).c_str());
         }
         char *currentOctet = strtok(CStyleStringArg, ".");
