@@ -126,7 +126,7 @@ public:
         int maxBitSize = sizeof(T) * 8 - 1;
         for (int i=maxBitSize; i>=0; i--) {
             if (numArg - (1<<i) >=0) {
-                numArg -= (1<<i);
+                numArg = (T)((int)numArg - (1<<i));
                 returnString.append("1");
             } else {
                 returnString.append("0");
