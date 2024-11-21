@@ -4,7 +4,3 @@ subnet: # First label runs first as default.
 
 clean: # Not first label, will not run unless called via make.
 	-rm -f subnet.exe subnet
-
-test:
-	echo File to clean: $(file)
-	echo OS: $(myOS)
