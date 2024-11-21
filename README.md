@@ -22,7 +22,7 @@ Each subnet will contain a network address, first usable address, final usable a
 
 Subnetter++ needs an IP address and subnet mask at minimum to run:
 
-> subnet ipAddr netmask1 \<netmask2>
+`subnet ipAddr netmask1 \<netmask2>`
 
 The netmasks can be passed in full subnet mask or CIDR mask format.
 
@@ -53,7 +53,7 @@ The first number that can be grabbed from the optional flag argument is used as 
 
 For example, the following command will only generate ten subnets in binary format, though it would generate 16 otherwise:
 
-> subnet -b10 10.0.0.1 20 24
+`subnet -b10 10.0.0.1 20 24`
 
 
 ## Output Examples
@@ -71,7 +71,7 @@ $ subnet 192.168.1.1 255.255.255.0
 
 CIDR masks can also be used interchangeably with full subnet masks; the command below outputs the same as the above:
 
-> subnet 192.168.1.1 24
+`subnet 192.168.1.1 24`
 
 If the resulting subnets are of mask /31, network and broadcast addresses are not formally shown:
 ```
