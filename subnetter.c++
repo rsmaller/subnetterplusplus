@@ -33,7 +33,7 @@ bool reverseFlag = false;
 int numberFlag = 0;
 
 void usage() {
-    cout << "Usage: " << basename(globalArgumentVector[0]) << " ipaddr netmask1 <netmask2> <-b[inary]|d[ebug]|r[everse]>" << endl;
+    cout << "Usage: " << basename(globalArgumentVector[0]) << " ipaddr netmask1 <netmask2> <-b[inary]|d[ebug]|r[everse]|limitNumber>" << endl;
     exit(0);
 }
 
