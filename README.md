@@ -6,7 +6,7 @@ This program is meant to automatically generate a list of subnets using an IP ad
 
 Each subnet will contain a network address, first usable address, final usable address, and broadcast address unless they are /31 or /32 subnets.
 
-/31 subnets will only have a first usable and final usable address; network and broadcast addresses are meaningless for IP address blocks of size 2.
+/31 subnets will only have a first usable and final usable address; network and broadcast addresses are meaningless for IP address blocks of size 2 or fewer.
 
 /32 subnets only have one address, and as such, only one address will be displayed.
 
@@ -22,7 +22,7 @@ Each subnet will contain a network address, first usable address, final usable a
 
 Subnetter++ needs an IP address and subnet mask at minimum to run:
 
-`subnet ipAddr netmask1 \<netmask2>`
+`subnet ipAddr netmask1 <netmask2>`
 
 The netmasks can be passed in full subnet mask or CIDR mask format.
 
