@@ -4,11 +4,11 @@
 
 This program is meant to automatically generate a list of subnets using an IP address and a VLSM range generated from one or two subnet masks.
 
-Each subnet will contain a network address, first usable address, final usable address, and broadcast address unless they are /31 or /32 subnets.
+Each subnet will contain a network address, first usable address, final usable address, and broadcast address unless they are `/31` or `/32` subnets.
 
-/31 subnets will only have a first usable and final usable address; network and broadcast addresses are meaningless for IP address blocks of size 2 or fewer.
+`/31` subnets will only have a first usable and final usable address; network and broadcast addresses are meaningless for IP address blocks of size 2 or fewer.
 
-/32 subnets only have one address, and as such, only one address will be displayed.
+`/32` subnets only have one address, and as such, only one address will be displayed.
 
 ## Features
 
