@@ -156,3 +156,13 @@ $ subnet -rb1 192.168.1.1 255.255.255.0 255.255.255.128
         11000000.10101000.00000001.00000001 - 11000000.10101000.00000001.01111110
         11000000.10101000.00000001.01111111 broadcast
 ```
+
+## Compiling
+Subnetter++ can be compiled to the binary `subnet` via Makefile:
+```
+make
+```
+The binary can be quickly removed with:
+```
+make clean
+```
