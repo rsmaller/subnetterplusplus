@@ -30,7 +30,7 @@ Without a second netmask argument, Subnetter++ will only generate a single subne
 
 If `netmask2` is provided, the number of subnets generated will be equal to two raised to the power of `netmask2`'s host bits - `netmask1`'s host bits.
 
-- Ex: If `netmask1` is 255.255.255.0(/24) and `netmask2` is 255.255.255.128(/24), the number of subnets generated is 2 ^ (25 - 24) => `2`.
+- Ex: If `netmask1` is 255.255.255.0(/24) and `netmask2` is 255.255.255.128(/25), the number of subnets generated is 2 ^ (25 - 24) => `2`.
 
 - Furthermore, the order the netmasks are provided does not matter; `subnet 172.16.1.1 255.255.255.0 255.255.255.128` will generate the same output as `subnet 172.16.1.1 255.255.255.128 255.255.255.0`.
 
