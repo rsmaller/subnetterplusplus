@@ -89,24 +89,22 @@ public:
     static IPNumeric StringToIPInt(string stringArg) {
         IPNumeric returnValue;
         IPNumeric CIDRConversion;
-        char *CStyleStringArg = (char *)malloc(sizeof(char) * stringArg.length() + 1);
+        string operatingString;
+        string currentOctet;
         if (isIPFormat(stringArg)) {
-            strcpy(CStyleStringArg, stringArg.c_str());
+            operatingString = stringArg;
         } else if (isCIDRMask(stringArg)) {
             CIDRConversion.IP32 = ~((1<<(32-stoi(stringArg)))-1);
-            strcpy(CStyleStringArg, intToIPString(CIDRConversion).c_str());
+            operatingString = intToIPString(CIDRConversion);
         } else {
             returnValue = {0};
             return returnValue;
         }
-        char *currentOctet = strtok(CStyleStringArg, ".");
-        returnValue.octets[3] = (unsigned char)atoi(currentOctet);
-        currentOctet = strtok(NULL, ".");
-        returnValue.octets[2] = (unsigned char)atoi(currentOctet);
-        currentOctet = strtok(NULL, ".");
-        returnValue.octets[1] = (unsigned char)atoi(currentOctet);
-        currentOctet = strtok(NULL, ".");
-        returnValue.octets[0] = (unsigned char)atoi(currentOctet);
+        for (int i=3; i>=0; i--) {
+            currentOctet = operatingString.substr(0, operatingString.find('.'));
+            operatingString.erase(0, operatingString.find('.') + 1);
+            returnValue.octets[i] = (unsigned char)stoi(currentOctet);
+        }
         return returnValue;
     }
 
