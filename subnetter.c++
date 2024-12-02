@@ -227,7 +227,6 @@ public:
 
     static bool verifyMask(SubnetMask netArg) {
         if (SubnetMask(netArg.networkBits).IPString.compare(netArg.IPString)) {
-            // cout << "Failed test mask " << netArg << " against " << SubnetMask(netArg.networkBits) << endl;
             return false;
         }
         return true;
