@@ -198,6 +198,9 @@ public:
         }
         this -> networkBits = 32 - hostBits;
         this -> numberOfSubnets = 1<<networkBits;
+        if (!verifyMask(*this)) {
+            *this = SubnetMask(getClosestNetworkBits(*this));
+        }
     }
 
     SubnetMask(int CIDRMask) : IP(~((1<<(32-CIDRMask)) - 1)) {
@@ -211,7 +214,6 @@ public:
             this -> networkBits = 0;
             this -> numberOfSubnets = 1;
         }
-        
     }
 
     SubnetMask() {}
@@ -231,6 +233,17 @@ public:
             return false;
         }
         return true;
+    }
+
+    static int getClosestNetworkBits(SubnetMask netArg) {
+        int currentIP32 = netArg.IPAddress.IP32;
+        int IP32Exp = 1<<31;
+        int bitshiftOperand = 30;
+        while (IP32Exp < currentIP32) {
+            IP32Exp += 1 << bitshiftOperand;
+            bitshiftOperand--;
+        }
+        return 32 - fetchHostBits(IP32Exp);
     }
 };
 
