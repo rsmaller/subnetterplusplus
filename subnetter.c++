@@ -4,6 +4,7 @@
 #include <cmath>
 #include <regex>
 #include <libgen.h>
+#include <time.h>
 #define strdup
 
 using namespace std;
@@ -441,6 +442,9 @@ void setFlags(arguments args) {
 }
 
 int main(int argc, char **argv) {
+    char buffer[1024*32];
+    ios::sync_with_stdio(false);
+    cin.tie(NULL);
     globalArgumentVector = argv;
     globalArgs = getArgs(argc, argv);
     setFlags(globalArgs);
@@ -459,5 +463,10 @@ int main(int argc, char **argv) {
     IP myIP(argv[globalArgs.IPArgumentIndex]);
     SubnetMask myMask1(argv[globalArgs.netMask1ArgumentIndex]);
     SubnetMask myMask2(argv[globalArgs.netMask2ArgumentIndex]);
+    clock_t startingClock, endingClock;
+    startingClock = clock();
     VLSM(myIP, myMask1, myMask2);
+    endingClock = clock();
+    cout << ((double)(endingClock - startingClock) / CLOCKS_PER_SEC) << " seconds to run" << endl;
+	setvbuf(stdout, buffer, _IONBF, 1024*32);
 }
