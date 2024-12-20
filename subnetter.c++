@@ -455,8 +455,7 @@ void setFlags(arguments args) {
 }
 
 int main(int argc, char **argv) {
-    char buffer[1024*32];
-    ios::sync_with_stdio(false);
+    ios_base::sync_with_stdio(false);
     cin.tie(NULL);
     globalArgumentVector = argv;
     globalArgs = getArgs(argc, argv);
@@ -480,6 +479,6 @@ int main(int argc, char **argv) {
     startingClock = clock();
     VLSM(myIP, myMask1, myMask2);
     endingClock = clock();
-    cout << ((double)(endingClock - startingClock) / CLOCKS_PER_SEC) << " seconds to run" << endl;
-	setvbuf(stdout, buffer, _IONBF, 1024*32);
+    double timeTotal = (double)(endingClock - startingClock) / CLOCKS_PER_SEC;
+    cout << timeTotal << " seconds to run" << endl;
 }
