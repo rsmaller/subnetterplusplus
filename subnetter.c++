@@ -1,5 +1,4 @@
 #include <iostream>
-#include <vector>
 #include <string.h>
 #include <cmath>
 #include <regex>
