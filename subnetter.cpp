@@ -1,3 +1,4 @@
+#pragma once
 #include <iostream>
 #include <string.h>
 #include <cmath>
@@ -384,6 +385,15 @@ void VLSM(IP IPAddr, SubnetMask netMask1, SubnetMask netMask2) {
     }
 }
 
+void timedVLSM(IP IPAddr, SubnetMask netMask1, SubnetMask netMask2) {
+    clock_t startingClock, endingClock;
+    startingClock = clock();
+    VLSM(IPAddr, netMask1, netMask2);
+    endingClock = clock();
+    double timeTotal = (double)(endingClock - startingClock) / CLOCKS_PER_SEC;
+    cout << timeTotal << " seconds to run" << endl;
+}
+
 arguments getArgs(int argc, char **argv) {
     arguments argStruct;
     string currentString;
@@ -474,10 +484,5 @@ int main(int argc, char **argv) {
     IP myIP(argv[globalArgs.IPArgumentIndex]);
     SubnetMask myMask1(argv[globalArgs.netMask1ArgumentIndex]);
     SubnetMask myMask2(argv[globalArgs.netMask2ArgumentIndex]);
-    clock_t startingClock, endingClock;
-    startingClock = clock();
-    VLSM(myIP, myMask1, myMask2);
-    endingClock = clock();
-    double timeTotal = (double)(endingClock - startingClock) / CLOCKS_PER_SEC;
-    cout << timeTotal << " seconds to run" << endl;
+    timedVLSM(myIP, myMask1, myMask2);
 }
