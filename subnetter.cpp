@@ -1,4 +1,3 @@
-#pragma once
 #include <iostream>
 #include <string.h>
 #include <cmath>
@@ -179,36 +178,42 @@ public:
 
 class SubnetMask : public IP {
 public:
-    long blockSize;
-    long numberOfSubnets;
-    int hostBits;
-    int networkBits;
+    unsigned long long blockSize;
+    unsigned long long numberOfSubnets;
+    unsigned int hostBits;
+    unsigned int networkBits;
 
     SubnetMask(string stringArg) : IP(stringArg) {
         if (isCIDRMask(stringArg)) {
-            this -> IPAddress.IP32 = ~((1<<(32-stoi(stringArg))) - 1);
+            this -> IPAddress.IP32 = CIDRToIPNumber(stoi(stringArg));
             this -> IPString = intToIPString(this -> IPAddress);
+            this -> IPBinaryString = toIPBinaryString(this -> IPAddress);
+        } else if (!stringArg.compare("0.0.0.0")) {
+            this -> IPAddress.IP32 = 0;
+            this -> IPString = stringArg;
             this -> IPBinaryString = toIPBinaryString(this -> IPAddress);
         }
         this -> hostBits = fetchHostBits((int)this -> IPAddress.IP32);
-        if (!unusualFormat) {
-            this -> blockSize = 1<<this -> hostBits;
+        if (this -> hostBits == 32) {
+            this -> blockSize = 4294967296ULL;
+        } else if (!unusualFormat) {
+            this -> blockSize = 1ULL<<(unsigned long long)(this -> hostBits);
         } else {
             this -> blockSize = 0;
         }
         this -> networkBits = 32 - hostBits;
         this -> numberOfSubnets = 1<<networkBits;
-        if (!verifyMask(*this)) {
+        if (!verifyMask(*this) && this->IPString.compare("0.0.0.0")) {
             *this = SubnetMask(getClosestNetworkBits(*this));
         }
     }
 
-    SubnetMask(int CIDRMask) : IP(~((1<<(32-CIDRMask)) - 1)) {
+    SubnetMask(int CIDRMask) : IP(~((1ULL<<(32-CIDRMask)) - 1)) {
         this -> hostBits = 32 - CIDRMask;
         if (!unusualFormat) {
-            this -> blockSize = 1<<this -> hostBits;
+            this -> blockSize = 1ULL<<this -> hostBits;
             this -> networkBits = CIDRMask;
-            this -> numberOfSubnets = 1<<networkBits;
+            this -> numberOfSubnets = 1ULL<<networkBits;
         } else {
             this -> blockSize = 0;
             this -> networkBits = 0;
@@ -218,7 +223,17 @@ public:
 
     SubnetMask() {}
 
+    static int CIDRToIPNumber(int CIDRNumber) {
+        if (CIDRNumber == 0) {
+            return 0;
+        }
+        return ~((1 << (32 - CIDRNumber)) - 1);
+    }
+
     static int fetchHostBits(int IPNumber) {
+        if (IPNumber == 0) {
+            return 32;
+        }
         int IPComplement = (int)(~IPNumber) + 1;
         for (int i=0; i<=32; i++) {
             if (1<<i == IPComplement) {
@@ -354,8 +369,13 @@ public:
 };
 
 void VLSM(IP IPAddr, SubnetMask netMask1, SubnetMask netMask2) {
-    if (IPAddr.unusualFormat || netMask1.unusualFormat || netMask2.unusualFormat || netMask1.blockSize < netMask2.blockSize) {
+    if (IPAddr.unusualFormat || netMask1.unusualFormat || netMask2.unusualFormat) {
         usage();
+    }
+    if (netMask1.blockSize < netMask2.blockSize) {
+        SubnetMask swapMask = netMask1;
+        netMask1 = netMask2;
+        netMask2 = swapMask;
     }
     IP localIPCopy = IPAddr;
     int networkMagnitudeDifference = netMask1.hostBits - netMask2.hostBits;
@@ -485,4 +505,19 @@ int main(int argc, char **argv) {
     SubnetMask myMask1(argv[globalArgs.netMask1ArgumentIndex]);
     SubnetMask myMask2(argv[globalArgs.netMask2ArgumentIndex]);
     timedVLSM(myIP, myMask1, myMask2);
+    // cout << SubnetMask("0").blockSize << endl;
+    // cout << SubnetMask("0").numberOfSubnets << endl;
+    // cout << SubnetMask("0").hostBits << endl;
+    // cout << endl;
+    // cout << "Block Size: " << SubnetMask("1").blockSize << endl;
+    // cout << "# of subnets:" << SubnetMask("1").numberOfSubnets << endl;
+    // cout << "Host bits: " << SubnetMask("1").hostBits << endl;
+    // cout << "IP32:" << SubnetMask("1").IPAddress.IP32 << endl;
+    // cout << SubnetMask("1") << endl;
+    // cout << SubnetMask::CIDRToIPNumber(stoi("1")) << endl;
+    // cout << endl;
+    // cout << SubnetMask("2").blockSize << endl;
+    // cout << SubnetMask("2").numberOfSubnets << endl;
+    // cout << SubnetMask("2").hostBits << endl;
+    // cout << endl << (4294967296UL) << endl;
 }
