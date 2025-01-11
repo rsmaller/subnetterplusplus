@@ -377,7 +377,7 @@ void VLSM(IP IPAddr, SubnetMask netMask1, SubnetMask netMask2) {
         netMask1 = netMask2;
         netMask2 = swapMask;
     }
-    IP localIPCopy = IPAddr;
+    IP localIPCopy = IPAddr & netMask1;
     int networkMagnitudeDifference = netMask1.hostBits - netMask2.hostBits;
     int subnetsToGenerate = 1<<networkMagnitudeDifference;
     if (numberFlag < subnetsToGenerate && numberFlag != 0) {
