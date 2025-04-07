@@ -30,7 +30,7 @@ arguments globalArgs;
 bool binaryFlag = false;
 bool debugFlag = false;
 bool reverseFlag = false;
-int numberFlag = 0;
+unsigned long long int numberFlag = 0;
 
 void usage() {
     cout << "Usage: " << basename(globalArgumentVector[0]) << " ipaddr netmask1 <netmask2> <-b[inary]|d[ebug]|r[everse]|limitNumber>" << endl;
@@ -208,7 +208,7 @@ public:
         }
     }
 
-    SubnetMask(int CIDRMask) : IP(~((1ULL<<(32-CIDRMask)) - 1)) {
+    SubnetMask(int CIDRMask) : IP(~(unsigned int)((1ULL<<(32-CIDRMask)) - 1)) {
         this -> hostBits = 32 - CIDRMask;
         if (!unusualFormat) {
             this -> blockSize = 1ULL<<this -> hostBits;
@@ -393,12 +393,12 @@ void VLSM(IP IPAddr, SubnetMask netMask1, SubnetMask netMask2) {
     cout << "-------------------------------------------------------------------" << endl;
     if (reverseFlag) {
         localIPCopy += (unsigned int)netMask2.blockSize * ((unsigned int)subnetsToGenerate - 1);
-        for (int i=0; i<subnetsToGenerate; i++) {
+        for (unsigned long long int i=0; i<subnetsToGenerate; i++) {
             cout << Subnet(localIPCopy, netMask2) << endl;
             localIPCopy -= (unsigned int)netMask2.blockSize;
         }
     } else {
-        for (int i=0; i<subnetsToGenerate; i++) {
+        for (unsigned long long int i=0; i<subnetsToGenerate; i++) {
             cout << Subnet(localIPCopy, netMask2) << endl;
             localIPCopy += (unsigned int)netMask2.blockSize;
         }
